@@ -1,0 +1,44 @@
+{
+  "name": "smallsrv",
+  "author": "tomfat",
+  "contributors": [
+    "Tomfat<yuezhang.nju@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "description": "A small http server used for debugging single page application",
+  "tags": [
+  ],
+  "keywords": [
+  ],
+  "main": "./lib/core.js",
+  "preferGlobal": "true",
+  "engines": {
+    "node": ">= 0.6.15"
+  },
+  "licenses": [
+    {
+      "type": "Apache",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "dependencies": {
+      "promise":"5.0.0"
+  },
+  "devDependencies": {
+      "promise":"5.0.0"
+  },
+  "homepage": "https://github.com/tomfat/smallsrv",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tomfat/smallsrv"
+  },
+  "bugs": {
+    "url": "https://github.com/tomfat/smallsrv/issues"
+  },
+  "scripts": {
+  },
+  "bin": {
+    "smallsrv": "./bin/smallsrv"
+  }
+}
+
