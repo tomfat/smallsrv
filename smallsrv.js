@@ -1,6 +1,11 @@
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var promise = require('promise');
+
+var stat_promise = promise.denodeify(fs.stat);
+var open_promise = promise.denodeify(fs.open);
+var readfile_promise = promise.denodeify(fs.readFile);
 
 var ssPort = 8080; //Default port is 8080
 var ssRoot = ".";//Default web root is current work directory.
@@ -18,39 +23,22 @@ var toLocalPath = function(url){
 new http.createServer(function(req, resp){
     console.log('Recevied:' + req.url); 
     var localPath = toLocalPath(req.url);
-    //if(localPath === './'){
-    //localPath = './index.html';
-    //}
-    console.log('DEBUG:' + localPath);
-    fs.open(localPath, 'r' , function(err, fd){
-        if(err){
-            resp.writeHead(404, {"Content-Type" : "test/plain"});
-        }else if(fd){
-            fs.stat(localPath, function(err, stat){
-                if(stat.isDirectory()) {
-                    if(!ssListDir){
-                        resp.writeHead(401, {"Content-Type" : "text/plain"});
-                        resp.write("Directory access is not alowed");
-                        resp.end();
-                    }                        
-                    fs.close(fd);
-                }else{
-                    fs.readFile(fd, function(err, data){
-                        if(err){
-                            resp.writeHead(500, {"Content-Type" : "test/plain"});
-                            resp.write("Unknown error");
-                        }else{
-                            resp.write(data);
-                        }
-                        resp.end();
-                        fs.close(fd);
-                    });
-                }
-            });
+    stat_promise(localPath).then(function(stat){
+        if(stat.isFile()){
+            return readfile_promise(localPath);
         }else{
-            resp.writeHead(500, {"Content-Type" : "test/plain"});
-            resp.write("Unknown error");
-            resp.end();
+            throw "file not found";   
         }
+    }).then(function(data){
+        resp.write(data);
+        console.log("Send response.");
+        resp.end();
+    },function(err){
+        console.log(err);
+        resp.writeHead(500, {"content-type" : "text/plain"});
+        resp.write(JSON.stringify(err));
+        console.log("Send response.");
+        resp.end();
     });
+
 }).listen(ssPort);
